@@ -1,0 +1,30 @@
+body{
+    background-color: #6D7D7E;
+}
+h1{
+    text-align: center;
+    color: white;
+}
+h2{
+    text-align: center;
+    color: white;
+}
+
+div.cuadro {
+    position: absolute;
+    top: 100px; left: 400px;
+    width: 600px; 
+    height: 500px; 
+    background:#000000;
+}
+
+h3
+{
+    text-align: center;
+    color: white;
+}
+
+a
+{
+    color: white;
+}
