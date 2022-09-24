@@ -1,8 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Mvc;
 using WebDev.Application.Models;
-using System.Linq;
 using WebDev.Application.Config;
 using WebDev.Services;
 using Microsoft.Extensions.Options;
@@ -10,7 +7,6 @@ using WebDev.Services.Entities;
 
 namespace WebDev.Application.Controllers
 {
-
     public class UsersController : Controller
     {
         private static List<User> _userList;
@@ -38,27 +34,22 @@ namespace WebDev.Application.Controllers
         [HttpGet]
         public async Task<ActionResult> Index()
         {
-            IList<UserDto> users = await usersService.GetUsers();
-
-            _userList = users.Select(userDto => MapperToUser(userDto)).ToList();
-
+            // Set Object Model
             return View(_userList);
         }
 
-        /// GET: UsersController/Details/5
+        // GET: UsersController/Details/5
         [HttpGet]
         public async Task<ActionResult> Details(int id)
         {
-            var userFound = await usersService.GetUserById(id);
+            var userFound = _userList.FirstOrDefault(u => u.Id == id);
 
             if (userFound == null)
             {
                 return NotFound();
             }
 
-            var user = MapperToUser(userFound);
-
-            return View(user);
+            return View(userFound);
         }
 
         // GET: UsersController/Create
@@ -77,7 +68,8 @@ namespace WebDev.Application.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var userAdded = await usersService.AddUser(MapperToUserDto(user));
+                    user.Id = ++numUsers;
+                    _userList.Add(user);
                 }
 
                 return RedirectToAction(nameof(Index));
@@ -88,22 +80,18 @@ namespace WebDev.Application.Controllers
             }
         }
 
-
-
         // GET: UsersController/Edit/5
         [HttpGet]
         public async Task<ActionResult> Edit(int id)
         {
-            var userFound = await usersService.GetUserById(id);
+            var userFound = _userList.FirstOrDefault(u => u.Id == id);
 
             if (userFound == null)
             {
                 return NotFound();
             }
 
-            var user = MapperToUser(userFound);
-
-            return View(user);
+            return View(userFound);
         }
 
         // POST: UsersController/Edit/5
@@ -115,7 +103,11 @@ namespace WebDev.Application.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var userModified = await usersService.UpdateUser(MapperToUserDto(user));
+                    var userFound = _userList.FirstOrDefault(u => u.Id == user.Id);
+                    userFound.Email = user.Email;
+                    userFound.Name = user.Name;
+                    userFound.Username = user.Username;
+                    userFound.Password = user.Password;
 
                     return RedirectToAction(nameof(Index));
                 }
@@ -132,16 +124,14 @@ namespace WebDev.Application.Controllers
         [HttpGet]
         public async Task<ActionResult> Delete(int id)
         {
-            var userFound = await usersService.GetUserById(id);
+            var userFound = _userList.FirstOrDefault(u => u.Id == id);
 
             if (userFound == null)
             {
                 return NotFound();
             }
 
-            var user = MapperToUser(userFound);
-
-            return View(user);
+            return View(userFound);
         }
 
         // POST: UsersController/Delete/5
@@ -151,15 +141,14 @@ namespace WebDev.Application.Controllers
         {
             try
             {
-                var userFound = await usersService.GetUserById(user.Id);
+                var userFound = _userList.FirstOrDefault(u => u.Id == user.Id);
 
                 if (userFound == null)
                 {
                     return View();
                 }
 
-                var userDeleted = await usersService.DeleteUser(user.Id);
-
+                _userList.Remove(userFound);
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -189,5 +178,6 @@ namespace WebDev.Application.Controllers
               password: user.Password
             );
         }
+
     }
 }
