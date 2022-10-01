@@ -1,0 +1,72 @@
+﻿@model IEnumerable<EmployeesWeb.Application.Models.Employee>
+@{
+    ViewData["Title"] = "UserListView";
+}
+
+<div class="container">
+    <h1>User List</h1>
+    <p>
+        <a asp-action="Create" class="btn btn-success"><i class="fas fa-plus"></i> Create New</a>
+    </p>
+</div>
+
+<div class="container">
+    <table class="table table-bordered" id="usersTable" width="100%" cellspacing="0">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.id)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.firstName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.lastName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.hireDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.department)
+                </th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.id)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.firstName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.lastName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.hireDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.department)
+                    </td>
+                    <td>
+                        <a class="btn btn-outline-primary" asp-action="Edit" asp-route-id="@item.id">Edit</a>
+                        <a class="btn btn-outline-info" asp-action="Details" asp-route-id="@item.id">Details</a>
+                        <a class="btn btn-outline-danger" asp-action="Delete" asp-route-id="@item.id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+</div>
+
+@section Scripts{
+	<script>
+		$(document).ready( function () {
+		    $('#usersTable').DataTable();
+		} );
+	</script>
+}
