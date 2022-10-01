@@ -1,5 +1,5 @@
 {
-  "Employees:
+  "Employees":
 [{"Id":1,"FirstName":"Bartlet","LastName":"Youdell","HireDate":"10/12/2020","Department":"Audit"},
 {"Id":2,"FirstName":"Allene","LastName":"Rowlatt","HireDate":"06/10/1987","Department":"It"},
 {"Id":3,"FirstName":"Ignacius","LastName":"Ivantyev","HireDate":"11/05/2004","Department":"It"},
