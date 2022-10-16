@@ -1,0 +1,14 @@
+{
+  "name": "webapi-server",
+  "version": "1.0.0",
+  "description": "Simulacion de Web Api",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Marco Rojas",
+  "license": "MIT",
+  "dependencies": {
+    "json-server": "^0.4.2"
+  }
+}
