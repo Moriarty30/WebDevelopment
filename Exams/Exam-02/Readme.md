@@ -32,3 +32,5 @@ Utilice el siguiente ejemplo para diseñar su UI
 
 recuerde Subir los cambios a su rama en esta misma ruta.
 **.../Exams/Exam-02**
+
+Link figma: https://www.figma.com/file/9SEMAltMHmUZEGBBetbtBb/Parcial?node-id=0%3A1
