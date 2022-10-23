@@ -1,25 +1,22 @@
-﻿using EmployeesWeb.Application.Mappers;
-using EmployeesWeb.Application.Models;
-using EmployeesWeb.Services;
+﻿using EmployeesWeb.Application.Models;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using System.Diagnostics;
 
 namespace EmployeesWeb.Application.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly LoginService loginService;
-        public HomeController(IConfiguration configuration)
+        private readonly ILogger<HomeController> _logger;
+
+        public HomeController(ILogger<HomeController> logger)
         {
-            var baseUrl = configuration["ApiConfiguration:BaseUrl"].ToString();
-            loginService = new LoginService(baseUrl);
+            _logger = logger;
         }
 
         public IActionResult Index()
         {
             ViewData["IsUserLogged"] = HttpContext.Session.GetString("IsUserLogged");
-            ViewData["User"] = HttpContext.Session.GetString("User");
+            ViewData["Employee"] = HttpContext.Session.GetString("Employee");
             return View();
         }
 
@@ -33,7 +30,6 @@ namespace EmployeesWeb.Application.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-
         [HttpGet]
         [Route("[controller]/[action]")]
         public IActionResult Login()
@@ -43,17 +39,21 @@ namespace EmployeesWeb.Application.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(Login login)
+        public async Task<IActionResult> Login(Login? login)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
                     // Llamar a la API para validar el Login
-                    if (await IsValidUser(login))
+#pragma warning disable CS8602 // Desreferencia de una referencia posiblemente NULL.
+#pragma warning disable CS8604 // Posible argumento de referencia nulo
+                    if (await IsValidUser(login.Email, login.Password))
                     {
-                        return Redirect(nameof(Index));
+                        return RedirectToAction(nameof(Index));
                     }
+#pragma warning restore CS8604 // Posible argumento de referencia nulo
+#pragma warning restore CS8602 // Desreferencia de una referencia posiblemente NULL.
                     ModelState.AddModelError(string.Empty, "Intento de inicio de sesión no válido.");
                 }
             }
@@ -70,19 +70,16 @@ namespace EmployeesWeb.Application.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private async Task<bool> IsValidUser(Login login)
+        private Task<bool> IsValidUser(string email, string password)
         {
-            var autorizationDto = await loginService.ValidUser(LoginMapper.ToDto(login));
-            if (autorizationDto == null)
+            if (email.Equals("demouser@email.com") && password.Equals("Password*01"))
             {
-                HttpContext.Session.SetString("IsUserLogged", "false");
-                return false;
+                HttpContext.Session.SetString("IsUserLogged", "true");
+                HttpContext.Session.SetString("User", email);
+                return Task.FromResult(true);
             }
-            HttpContext.Session.SetString("IsUserLogged", "true");
-            HttpContext.Session.SetString("User", login.Email);
-            HttpContext.Session.SetString("AccessToken", JsonConvert.SerializeObject(autorizationDto.AccessToken));
-
-            return true;
+            HttpContext.Session.SetString("IsUserLogged", "false");
+            return Task.FromResult(false);
         }
     }
 }
