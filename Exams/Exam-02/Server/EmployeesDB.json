@@ -713,6 +713,14 @@
       "hireDate": "30/10/2000",
       "epartment": "It",
       "id": 102
+    },
+    {
+      "Id": 0,
+      "FirstName": "Fercho",
+      "LastName": "regre",
+      "HireDate": "2022-10-10T00:36:00",
+      "Department": "Finance",
+      "id": 103
     }
   ]
 }
