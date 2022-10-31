@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿//using EmployeesWeb.Application.Mappers;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using EmployeesWeb.Application.Models;
-using System.Linq;
 using EmployeesWeb.Application.Config;
 using EmployeesWeb.Services;
 using Microsoft.Extensions.Options;
@@ -12,19 +10,22 @@ namespace EmployeesWeb.Application.Controllers
 {
     public class EmployeesController : Controller
     {
-        private static List<Employee> _employeeList;
-        private static int numEmployees;
+        private static List<Employee>? _employeeList;
         private readonly ApiConfiguration _apiConfiguration;
-        private EmployeesService employeesService;
+        private readonly EmployeesService employeesService;
         public EmployeesController(IOptions<ApiConfiguration> apiConfiguration)
         {
             _apiConfiguration = apiConfiguration.Value;
+#pragma warning disable CS8604 // Posible argumento de referencia nulo
             employeesService = new EmployeesService(_apiConfiguration.ApiEmployeesUrl);
+#pragma warning restore CS8604 // Posible argumento de referencia nulo
         }
 
         // GET: EmployeesController
         public async Task<ActionResult> Index()
         {
+            ViewData["IsUserLogged"] = HttpContext.Session.GetString("IsUserLogged");;
+
             IList<EmployeeDto> employees = await employeesService.GetEmployees();
 
             _employeeList = employees.Select(employeeDto => MapperToEmployee(employeeDto)).ToList();
@@ -32,9 +33,11 @@ namespace EmployeesWeb.Application.Controllers
             return View(_employeeList);
         }
 
-        // GET: EmployeesController/Details/5
+        // GET: EmployeesController/Details
         public async Task<ActionResult> Details(int id)
         {
+            ViewData["IsUserLogged"] = HttpContext.Session.GetString("IsUserLogged");
+
             EmployeeDto employeeDto = await employeesService.GetEmployeeById(id);
 
             var employee = MapperToEmployee(employeeDto);
@@ -45,6 +48,8 @@ namespace EmployeesWeb.Application.Controllers
         // GET: EmployeesController/Create
         public ActionResult Create()
         {
+            ViewData["IsUserLogged"] = HttpContext.Session.GetString("IsUserLogged");
+
             return View();
         }
 
@@ -68,7 +73,7 @@ namespace EmployeesWeb.Application.Controllers
             }
         }
 
-        // GET: EmployeesController/Edit/5
+        // GET: EmployeesController/Edit
         public async Task<ActionResult> Edit(int id)
         {
             var employeeFound = await employeesService.GetEmployeeById(id);
@@ -78,12 +83,14 @@ namespace EmployeesWeb.Application.Controllers
                 return NotFound();
             }
 
+            ViewData["IsUserLogged"] = HttpContext.Session.GetString("IsUserLogged");
+
             var employee = MapperToEmployee(employeeFound);
 
             return View(employee);
         }
 
-        // POST: EmployeesController/Edit/5
+        // POST: EmployeesController/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(Employee employee)
@@ -92,7 +99,7 @@ namespace EmployeesWeb.Application.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var employeeModified =  await employeesService.UpdateEmployee(MapperToEmployeeDto(employee));
+                    var employeeModified = await employeesService.UpdateEmployee(MapperToEmployeeDto(employee));
 
                     return RedirectToAction(nameof(Index));
                 }
@@ -104,7 +111,7 @@ namespace EmployeesWeb.Application.Controllers
             }
         }
 
-        // GET: EmployeesController/Delete/5
+        // GET: EmployeesController/Delete
         public async Task<ActionResult> Delete(int id)
         {
             var employeeFound = await employeesService.GetEmployeeById(id);
@@ -114,26 +121,28 @@ namespace EmployeesWeb.Application.Controllers
                 return NotFound();
             }
 
+            ViewData["IsUserLogged"] = HttpContext.Session.GetString("IsUserLogged");
+
             var employee = MapperToEmployee(employeeFound);
 
             return View(employee);
         }
 
-        // POST: EmployeesController/Delete/5
+        // POST: EmployeesController/Delete
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Delete(Employee employee)
         {
             try
             {
-                var employeeFound = await employeesService.GetEmployeeById(employee.id);
+                var employeeFound = await employeesService.GetEmployeeById(employee.Id);
 
                 if (employeeFound == null)
                 {
                     return View();
                 }
 
-                var employeeDeleted = await employeesService.DeleteEmployee(employee.id);
+                var employeeDeleted = await employeesService.DeleteEmployee(employee.Id);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -143,27 +152,29 @@ namespace EmployeesWeb.Application.Controllers
             }
         }
 
-        private Employee MapperToEmployee(EmployeeDto employeeDto)
+        private static Employee MapperToEmployee(EmployeeDto employeeDto)
         {
             return new Employee
             {
-                id = employeeDto.id,
-                firstName= employeeDto.firstName,
-                lastName = employeeDto.lastName,
-                hireDate = employeeDto.hireDate,
-                department = employeeDto.department
+                Id = employeeDto.Id,
+                FirstName = employeeDto.FirstName,
+                LastName = employeeDto.LastName,
+                HireDate = employeeDto.HireDate,
+                Department = employeeDto.Department
             };
         }
 
-        private EmployeeDto MapperToEmployeeDto(Employee employee)
+        private static EmployeeDto MapperToEmployeeDto(Employee employee)
         {
+#pragma warning disable CS8604 // Posible argumento de referencia nulo
             return EmployeeDto.Build(
-              id: employee.id,
-              FirstName: employee.firstName,
-              LastName: employee.lastName,
-              HireDate: employee.hireDate,
-              department: employee.department
+              id: employee.Id,
+              firstName: employee.FirstName,
+              lastName: employee.LastName,
+              hireDate: employee.HireDate,
+              department: employee.Department
             );
+#pragma warning restore CS8604 // Posible argumento de referencia nulo
         }
 
     }

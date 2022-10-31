@@ -2,17 +2,25 @@
 
 namespace EmployeesWeb.Application.Models
 {
+
+    public enum DepartmentType
+    {
+        IT,
+        Audit,
+        Finance
+    }
     public class Employee
     {
         [Key]
-        public int id { get; set; }
-        [Required(ErrorMessage = "El email es obligatorio")]
-        public string firstName { get; set; }
-        [Required(ErrorMessage = "El nombre es obligatorio")]
-        public string lastName { get; set; }
-        [Required(ErrorMessage = "El nombre de usuario es obligatorio")]
-        public String hireDate { get; set; }
-        [Required(ErrorMessage = "El password es obligatorio")]
-        public string department { get; set; }
+        public int Id { get; set; }
+        [Required(ErrorMessage = "El firstName es obligatorio")]
+        public string? FirstName { get; set; }
+        [Required(ErrorMessage = "El lastName es obligatorio")]
+        public string? LastName { get; set; }
+        [Required(ErrorMessage = "El hireDate es obligatorio")]
+        public DateTime HireDate { get; set; }
+        [Required(ErrorMessage = "El department es obligatorio")]
+        [RegularExpression("IT|Finance|Audit", ErrorMessage = "Invalid Department")]
+        public string? Department { get; set; }
     }
 }
